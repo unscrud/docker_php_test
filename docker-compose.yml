@@ -10,9 +10,9 @@ php: # nome do container
      - db # estabelece a comunicação entre os containers
 
 db: # segundo container que será usado
-    image: mysql:5.migs/mysql-5.7 # com base na imagem do mysql
+    image: mysql:5.7 # com base na imagem do mysql
     volumes: 
      - /var/lib/mysql # neste volume
-     environment: # com as variáveis de ambientes que vão setar
+    environment: # com as variáveis de ambientes que vão setar
      - MYSQL_ROOT_PASSWORD=myrootpass # senha 
      - MYSQL_DATABASE=mydb # nome do banco que será criado
