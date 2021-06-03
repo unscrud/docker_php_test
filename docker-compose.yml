@@ -1,18 +1,40 @@
-# arquivo responsável pela orquestração do container
-php: # nome do container
-    build: . # local do Dockerfile
-    ports:  # mapeamento de portas
-     - "80:80" # chamadas para a porta 80 do host serão redirecionadas para a porta 80 do container
-     - "443:443"
-    volumes: # mapeamento de volumes
-     - ./www:/var/www/html # o conteúdo de www estará em /var/www/html
-    links: 
-     - db # estabelece a comunicação entre os containers
+version: '3.3'
 
-db: # segundo container que será usado
-    image: mysql:5.7 # com base na imagem do mysql
-    volumes: 
-     - /var/lib/mysql # neste volume
-    environment: # com as variáveis de ambientes que vão setar
-     - MYSQL_ROOT_PASSWORD=myrootpass # senha 
-     - MYSQL_DATABASE=mydb # nome do banco que será criado
+services:
+    wordpress_db:
+        image: mysql:5.7
+        volumes: 
+            - db_data:/var/lib/mysql
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: rootpass
+            MYSQL_DATABASE: wordpress
+            MYSQL_USER: wordpress
+            MYSQL_PASSWORD: wordpress
+    
+    wordpress:
+        depends_on: 
+            - wordpress_db
+        image: wordpress:latest
+        ports:
+            - "80:80"
+            - "443:443"
+        restart: always
+        environment: 
+            WORDPRESS_DB_HOST: wordpress_db:3306
+            WORDPRESS_DB_USER: wordpress
+            WORDPRESS_DB_PASSWORD: wordpress
+
+    phpmyadmin:
+        depends_on: 
+            - wordpress_db
+        image: phpmyadmin/phpmyadmin
+        restart: always
+        ports: 
+            - 88:80
+        environment: 
+            PMA_HOST: wordpress_db:3306
+            MYSQL_ROOT_PASSWORD: rootpass
+
+volumes: 
+    db_data:
